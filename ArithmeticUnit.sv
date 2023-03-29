@@ -12,7 +12,7 @@ module ArithmeticUnit(
 );
 
   // If the least significant opcode bit is 0, it is an addition
-  always_comb case (opcode)
+  always @(opcode or operandA or operandB) case (opcode)
     3'b100: result = operandA + operandB;
     3'b101: result = operandA - operandB;
     default: result = 0;
