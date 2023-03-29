@@ -7,15 +7,18 @@
 //       100 - reg4 (General purpose A)
 //       101 - reg5 (General purpose B)
 module RegisterFile(
+  // Control inputs
   input var logic clock,
   input var logic reset,
   input var logic save,
 
+  // Save/load
   input var logic[2:0] saveselector,
   input var logic[7:0] savebus,
   input var logic[2:0] loadselector,
   output var logic[7:0] loadbus,
 
+  // Fixed outputs
   output var logic[7:0] aluoperandA,
   output var logic[7:0] aluoperandB,
   output var logic[7:0] aluresult
@@ -25,13 +28,15 @@ module RegisterFile(
   var logic[7:0] registers[5:0];
 
   // Reset everything to 0 or save value
-  always @(posedge clock or posedge reset)
-    if (reset)
-      for (int ii = 0; ii < 6; ii = ii + 1)
+  always @(posedge clock or posedge reset) begin
+    if (reset) begin
+      for (int ii = 0; ii < 6; ii = ii + 1) begin
         registers[ii] <= 8'b0;
-    else
-      if (save)
+      end
+    end else if (save) begin
         registers[saveselector] <= savebus;
+    end
+  end
 
   // Load selected register value to loadbus
   assign loadbus = registers[loadselector];
