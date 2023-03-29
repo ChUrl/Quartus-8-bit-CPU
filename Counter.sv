@@ -1,19 +1,20 @@
 `default_nettype none
 
-module Counter(
+module Counter
+  #(parameter WIDTH = 8)(
   input var logic clock,
   input var logic reset,
   input var logic decrement,
   input var logic setvalue,
-  input var logic[7:0] valuein,
-  output var logic[7:0] valueout
+  input var logic[WIDTH-1:0] valuein,
+  output var logic[WIDTH-1:0] valueout
 );
 
-  var logic[7:0] countervalue;
+  var logic[WIDTH-1:0] countervalue;
 
   always @(posedge clock or posedge reset) begin
     if (reset) begin
-      countervalue = 8'b0;
+      countervalue = WIDTH'(0);
     end else if (setvalue) begin
       countervalue = valuein;
     end else begin
