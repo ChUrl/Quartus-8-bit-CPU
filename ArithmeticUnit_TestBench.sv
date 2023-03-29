@@ -7,7 +7,7 @@ var logic[7:0] operandA;
 var logic[7:0] operandB;
 tri[7:0] result;
 
-ArithmeticUnit lu(
+ArithmeticUnit au(
   .opcode(opcode),
   .operandA(operandA),
   .operandB(operandB),
