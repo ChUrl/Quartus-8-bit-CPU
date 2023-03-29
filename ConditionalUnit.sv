@@ -11,13 +11,14 @@
 //              110 - >  0
 //              111 - >= 0
 module ConditionalUnit(
+  input var logic clock,
   input var logic[2:0] opcode,
   input var logic signed[7:0] operand,
   output var logic result
 );
 
   // This could be simplified significantly (basically removed), if I had ALU flags.
-  always_comb case (opcode)
+  always @(posedge clock) case (opcode)
     3'b000: result = 0;
     3'b001: result = (operand == 0);
     3'b010: result = (operand < 0);

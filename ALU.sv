@@ -9,6 +9,7 @@
 //              100 - ADD
 //              101 - SUB
 module ALU(
+  input var logic clock,
   input var logic[2:0] opcode,
   input var logic signed[7:0] operandA,
   input var logic signed[7:0] operandB,
@@ -37,7 +38,7 @@ module ALU(
   // "always @(opcode or operandA or operandB)"
   // This didn't work though, the result didn't update correctly.
   // TODO: Figure out why
-  always @(lu_result or au_result) case (opcode)
+  always @(posedge clock) case (opcode)
     3'b000,
     3'b001,
     3'b010,
