@@ -3,9 +3,9 @@
 module ALU_TestBench;
 
 var logic[2:0] opcode;
-var logic[7:0] operandA;
-var logic[7:0] operandB;
-tri[7:0] result;
+var logic signed[7:0] operandA;
+var logic signed[7:0] operandB;
+tri signed[7:0] result;
 
 ALU alu(
   .opcode(opcode),
@@ -22,7 +22,7 @@ initial begin
     opcode = 3'b000;
     operandA = 8'b00000000;
     operandB = 8'b00000000;
-    #100 assert(result == 8'b00000000);
+    #20 assert(result == 8'b00000000);
 
     // First set of operands
     operandA = 8'b00000000;

@@ -10,14 +10,14 @@
 //              101 - SUB
 module ALU(
   input var logic[2:0] opcode,
-  input var logic[7:0] operandA,
-  input var logic[7:0] operandB,
-  output var logic[7:0] result
+  input var logic signed[7:0] operandA,
+  input var logic signed[7:0] operandB,
+  output var logic signed[7:0] result
 );
 
   // This is a var logic, because I only want a single driver.
   // It should be synthesized to a wire, as nothing is stored (hopefully?).
-  var logic[7:0] lu_result;
+  var logic signed[7:0] lu_result;
   LogicalUnit lu(
     .opcode(opcode),
     .operandA(operandA),
@@ -25,7 +25,7 @@ module ALU(
     .result(lu_result)
   );
 
-  var logic[7:0] au_result;
+  var logic signed[7:0] au_result;
   ArithmeticUnit au(
     .opcode(opcode),
     .operandA(operandA),

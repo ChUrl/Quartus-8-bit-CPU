@@ -6,9 +6,9 @@
 //              101 - SUB
 module ArithmeticUnit(
   input var logic[2:0] opcode,
-  input var logic[7:0] operandA,
-  input var logic[7:0] operandB,
-  output var logic[7:0] result
+  input var logic signed[7:0] operandA,
+  input var logic signed[7:0] operandB,
+  output var logic signed[7:0] result
 );
 
   // If the least significant opcode bit is 0, it is an addition

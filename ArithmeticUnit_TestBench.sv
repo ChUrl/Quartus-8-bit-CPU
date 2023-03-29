@@ -3,9 +3,9 @@
 module ArithmeticUnit_TestBench;
 
 var logic[2:0] opcode;
-var logic[7:0] operandA;
-var logic[7:0] operandB;
-tri[7:0] result;
+var logic signed[7:0] operandA;
+var logic signed[7:0] operandB;
+tri signed[7:0] result;
 
 ArithmeticUnit au(
   .opcode(opcode),
