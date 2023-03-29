@@ -19,6 +19,7 @@ module RegisterFile(
   output var logic[7:0] loadbus,
 
   // Fixed outputs
+  output var logic[7:0] jumptarget,
   output var logic[7:0] aluoperandA,
   output var logic[7:0] aluoperandB,
   output var logic[7:0] aluresult
@@ -42,6 +43,7 @@ module RegisterFile(
   assign loadbus = registers[loadselector];
 
   // Always propagate contents of ALU registers
+  assign jumptarget = registers[0];
   assign aluoperandA = registers[1];
   assign aluoperandB = registers[2];
   assign aluresult = registers[3];
