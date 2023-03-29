@@ -15,6 +15,8 @@ module ALU(
   output var logic[7:0] result
 );
 
+  // This is a var logic, because I only want a single driver.
+  // It should be synthesized to a wire, as nothing is stored (hopefully?).
   var logic[7:0] lu_result;
   LogicalUnit lu(
     .opcode(opcode),
@@ -31,8 +33,11 @@ module ALU(
     .result(au_result)
   );
 
-  // If the first most significant opcode bit is 0, it is a logical operation.
-  always_comb case (opcode)
+  // Originally, I used the same sensitivity list as with the LogicalUnit/ArithmeticUnit:
+  // "always @(opcode or operandA or operandB)"
+  // This didn't work though, the result didn't update correctly.
+  // TODO: Figure out why
+  always @(lu_result or au_result) case (opcode)
     3'b000,
     3'b001,
     3'b010,
