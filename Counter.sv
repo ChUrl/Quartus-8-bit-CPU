@@ -11,13 +11,15 @@ module Counter(
 
   var logic[7:0] countervalue;
 
-  always @(posedge clock or posedge reset)
-    if (reset)
-      countervalue <= 8'b0;
-    else if (setvalue)
-      countervalue <= valuein;
-    else
-      countervalue <= countervalue + (decrement ? -1 : 1);
+  always @(posedge clock or posedge reset) begin
+    if (reset) begin
+      countervalue = 8'b0;
+    end else if (setvalue) begin
+      countervalue = valuein;
+    end else begin
+      countervalue = countervalue + (decrement ? -1 : 1);
+    end
+  end
 
   assign valueout = countervalue;
 endmodule
