@@ -13,7 +13,7 @@ module LogicalUnit(
   output var logic[7:0] result
 );
 
-  always_comb case (opcode)
+  always @(opcode or operandA or operandB) case (opcode)
     3'b000: result = operandA & operandB;
     3'b001: result = operandA | operandB;
     3'b010: result = ~(operandA & operandB);
