@@ -18,7 +18,7 @@ module Counter
     end else if (setvalue) begin
       countervalue = valuein;
     end else begin
-      countervalue = countervalue + (decrement ? -1 : 1);
+      countervalue = countervalue + (decrement ? WIDTH'(-1) : WIDTH'(1));
     end
   end
 
