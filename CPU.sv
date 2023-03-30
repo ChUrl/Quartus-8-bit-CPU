@@ -11,8 +11,7 @@ module CPU(
 );
 
 // Decoder
-var logic fetch, decode, execute, writeback;
-var logic clk;
+var logic fetch, decode, execute, writeback, clk;
 assign clk = enable && clock; // Only clock the CPU when enabled
 Decoder dec(
   .clock(clk),
@@ -25,8 +24,7 @@ Decoder dec(
 
 // Program Counter
 var logic pc_set;
-var logic[7:0] pc_in;
-var logic[7:0] pc_out;
+var logic[7:0] pc_in, pc_out;
 Counter pc(
   .clock(fetch), // WARNING: Phase 1 - Fetch
   .reset(reset),
@@ -44,11 +42,10 @@ ROM rom(
 );
 
 // Controller
-var logic[1:0] ctrl_opcode;
-var logic[5:0] ctrl_arg;
-var logic[2:0] ctrl_arg0, ctrl_arg1;
 var logic ctrl_regsset, ctrl_pcset;
-var logic[2:0] ctrl_regssavesel, ctrl_regsloadsel, ctrl_aluopc, ctrl_condopc;
+var logic[1:0] ctrl_opcode;
+var logic[2:0] ctrl_arg0, ctrl_arg1, ctrl_regssavesel, ctrl_regsloadsel, ctrl_aluopc, ctrl_condopc;
+var logic[5:0] ctrl_arg;
 Controller ctrl(
   .clock(decode), // WARNING: Phase 2 - Decode
   .reset(reset),
@@ -67,12 +64,7 @@ Controller ctrl(
 
 // Register Bank
 var logic regs_set;
-var logic[7:0] regs_savebus;
-var logic[7:0] regs_loadbus;
-var logic[7:0] regs_jumptarget;
-var logic[7:0] regs_aluopA;
-var logic[7:0] regs_aluopB;
-var logic[7:0] regs_aluresult;
+var logic[7:0] regs_savebus, regs_loadbus, regs_jumptarget, regs_aluopA, regs_aluopB, regs_aluresult;
 RegisterFile regs(
   .clock(writeback), // WARNING: Phase 4 - Writeback
   .reset(reset),
@@ -110,9 +102,6 @@ ConditionalUnit cond(
 assign pc_set = cond_result && ctrl_pcset;
 assign pc_in = regs_jumptarget;
 assign regs_set = ctrl_regsset && (ctrl_arg0 != 3'b110);
-
-// assign regs_savebus = ;
-// assign cpuout = ;
 
 // TODO: Should add this to the Controller probably?
 //       Or a new module, like "BusController"? Or just "Bus"?
