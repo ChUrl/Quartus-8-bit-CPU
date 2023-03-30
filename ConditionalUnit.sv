@@ -27,6 +27,5 @@ module ConditionalUnit(
     3'b101: result = (operand != 0);
     3'b110: result = (operand > 0);
     3'b111: result = (operand >= 0);
-    default: result = 0;
   endcase
 endmodule
