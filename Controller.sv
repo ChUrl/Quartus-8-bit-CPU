@@ -5,11 +5,13 @@ module Controller(
   input var logic reset,
   input var logic[7:0] databus,
 
+  // Fixed outputs
   output var logic[1:0] opcode,
   output var logic[5:0] arg,
   output var logic[2:0] arg0,
   output var logic[2:0] arg1,
   
+  // Outputs depending on opcode
   output var logic regs_set,
   output var logic[2:0] regs_savesel,
   output var logic[2:0] regs_loadsel,
