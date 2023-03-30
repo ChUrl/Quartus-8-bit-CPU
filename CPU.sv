@@ -3,7 +3,11 @@
 module CPU(
   input var logic enable,
   input var logic clock,
-  input var logic reset
+  input var logic reset,
+
+  // TODO: Replace with Input/Output module
+  input var logic[7:0] cpuin,
+  output var logic[7:0] cpuout
 );
 
 // Decoder
@@ -41,6 +45,8 @@ ROM rom(
 
 // Controller
 var logic[1:0] ctrl_opcode;
+var logic[5:0] ctrl_arg;
+var logic[2:0] ctrl_arg0, ctrl_arg1;
 var logic ctrl_regsset, ctrl_pcset;
 var logic[2:0] ctrl_regssavesel, ctrl_regsloadsel, ctrl_aluopc, ctrl_condopc;
 Controller ctrl(
@@ -48,6 +54,9 @@ Controller ctrl(
   .reset(reset),
   .databus(rom_data),
   .opcode(ctrl_opcode),
+  .arg(ctrl_arg),
+  .arg0(ctrl_arg0),
+  .arg1(ctrl_arg1),
   .regs_set(ctrl_regsset),
   .regs_savesel(ctrl_regssavesel),
   .regs_loadsel(ctrl_regsloadsel),
@@ -57,6 +66,7 @@ Controller ctrl(
 );
 
 // Register Bank
+var logic regs_set;
 var logic[7:0] regs_savebus;
 var logic[7:0] regs_loadbus;
 var logic[7:0] regs_jumptarget;
@@ -66,7 +76,7 @@ var logic[7:0] regs_aluresult;
 RegisterFile regs(
   .clock(writeback), // WARNING: Phase 4 - Writeback
   .reset(reset),
-  .save(ctrl_regsset),
+  .save(regs_set),
   .saveselector(ctrl_regssavesel),
   .savebus(regs_savebus),
   .loadselector(ctrl_regsloadsel),
@@ -96,14 +106,38 @@ ConditionalUnit cond(
   .result(cond_result)
 );
 
-// CPU Inter-Component Connections
+// Missing CPU Inter-Component Connections
 assign pc_set = cond_result && ctrl_pcset;
 assign pc_in = regs_jumptarget;
+assign regs_set = ctrl_regsset && (ctrl_arg0 != 3'b110);
 
+// assign regs_savebus = ;
+// assign cpuout = ;
+
+// TODO: Should add this to the Controller probably?
+//       Or a new module, like "BusController"? Or just "Bus"?
 always @(execute) case (ctrl_opcode)
-  2'b01: regs_savebus = alu_result;
-  2'b11: regs_savebus = regs_loadbus;
-  default: regs_savebus = 8'b00000000;
+  2'b01: begin
+    cpuout = 8'b00000000;
+    regs_savebus = alu_result;
+  end
+  2'b11: if (ctrl_arg0 == 3'b110) begin
+    // Write to output
+    cpuout = regs_loadbus;
+    regs_savebus = 8'b00000000;
+  end else if (ctrl_arg1 == 3'b110) begin
+    // Load from input
+    cpuout = 8'b00000000;
+    regs_savebus = cpuin;
+  end else begin
+    // Copy from reg to reg
+    cpuout = 8'b00000000;
+    regs_savebus = regs_loadbus;
+  end
+  default: begin
+    cpuout = 8'b00000000;
+    regs_savebus = 8'b00000000;
+  end
 endcase
 
 endmodule
