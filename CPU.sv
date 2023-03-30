@@ -7,7 +7,21 @@ module CPU(
 
   // TODO: Replace with Input/Output module
   input var logic[7:0] cpuin,
-  output var logic[7:0] cpuout
+  output var logic[7:0] cpuout,
+
+  // Debug Outputs
+  output var logic dbg_fetch,
+  output var logic dbg_decode,
+  output var logic dbg_execute,
+  output var logic dbg_writeback,
+  output var logic[7:0] dbg_pcout,
+  output var logic[7:0] dbg_romout,
+  output var logic[7:0] dbg_savebus,
+  output var logic[7:0] dbg_loadbus,
+  output var logic[7:0] dbg_jumptarget,
+  output var logic[7:0] dbg_aluopA,
+  output var logic[7:0] dbg_aluopB,
+  output var logic[7:0] dbg_aluresult
 );
 
 // Decoder
@@ -82,7 +96,7 @@ RegisterFile regs(
 // Arithmetic and Logical Unit
 var logic[7:0] alu_result;
 ALU alu(
-  .clock(execute), // WARNING: Phase 3 - Execute
+  // .clock(execute), // WARNING: Phase 3 - Execute // TODO
   .opcode(ctrl_aluopc),
   .operandA(regs_aluopA),
   .operandB(regs_aluopB),
@@ -92,7 +106,7 @@ ALU alu(
 // Conditional Unit
 var logic cond_result;
 ConditionalUnit cond(
-  .clock(execute), // WARNING: Phase 3 - Execute
+  // .clock(execute), // WARNING: Phase 3 - Execute // TODO
   .opcode(ctrl_condopc),
   .operand(regs_aluresult),
   .result(cond_result)
@@ -103,14 +117,25 @@ assign pc_set = cond_result && ctrl_pcset;
 assign pc_in = regs_jumptarget;
 assign regs_set = ctrl_regsset && (ctrl_arg0 != 3'b110);
 
+// FIXME: ALU writeback doesn't work:
+//        - Execute clocks the ALU
+//        - Execute connects alu_result to regs_savebus.
+//          This has to happen after the ALU was clocked.
+//          Remove the ALU/Cond clock entirely (for now)?
 // TODO: Should add this to the Controller probably?
 //       Or a new module, like "BusController"? Or just "Bus"?
-always @(execute) case (ctrl_opcode)
+always @(execute) case (ctrl_opcode) // WARNING: Phase 3 - Execute ("Execute" currently means "BusControl")
+  2'b00: begin
+    // Load constant
+    cpuout = 8'b00000000;
+    regs_savebus = ctrl_arg;
+  end
   2'b01: begin
+    // Save ALU result
     cpuout = 8'b00000000;
     regs_savebus = alu_result;
   end
-  2'b11: if (ctrl_arg0 == 3'b110) begin
+  2'b10: if (ctrl_arg0 == 3'b110) begin
     // Write to output
     cpuout = regs_loadbus;
     regs_savebus = 8'b00000000;
@@ -124,9 +149,24 @@ always @(execute) case (ctrl_opcode)
     regs_savebus = regs_loadbus;
   end
   default: begin
+    // Conditional jump
     cpuout = 8'b00000000;
     regs_savebus = 8'b00000000;
   end
 endcase
+
+// Debug outputs
+assign dbg_fetch = fetch;
+assign dbg_decode = decode;
+assign dbg_execute = execute;
+assign dbg_writeback = writeback;
+assign dbg_pcout = pc_out;
+assign dbg_romout = rom_data;
+assign dbg_savebus = regs_savebus;
+assign dbg_loadbus = regs_loadbus;
+assign dbg_jumptarget = regs_jumptarget;
+assign dbg_aluopA = regs_aluopA;
+assign dbg_aluopB = regs_aluopB;
+assign dbg_aluresult = regs_aluresult;
 
 endmodule
